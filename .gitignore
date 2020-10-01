@@ -1,3 +1,6 @@
 *.out
-**/*.out
 **/tests-out
+**/wcat/wcat
+**/wgrep/wgrep
+**/wgrep/keke.txt
+
