@@ -9,7 +9,7 @@ void changeDirectory(char* buffer);
 void updatePath(char* buffer);
 
 char error_message[30] = "An error has occurred\n";
-char** PATH;
+char PATH[100][100];
 
 int main(int argc, char** argv) {
     if (argc > 2) {
@@ -65,9 +65,17 @@ void initBatchShell(char* batchFile) {
 
 void updatePath(char* args) {
     char* token;
+    int i = 0;
     while ((token = strsep(&args, " ")) != NULL) {
-        ;
+        strcpy(PATH[i], token);
+        i++;
     }
+    strcpy(PATH[i], "\0");
+    /*
+    for(int k = 0; k < i; k++ ) {
+        printf("path %d: %s\n", k, PATH[k]);
+    }
+    */
 }
 
 void changeDirectory(char* args) {
