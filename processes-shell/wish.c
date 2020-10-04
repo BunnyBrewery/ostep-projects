@@ -1,10 +1,15 @@
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 void initInteractiveShell();
 void initBatchShell(char* batchFile);
-void changeDirectory(char* buffer, int length, int max); 
-void parseArgs(char* buffer, int* length, int* max, char* args);
+void changeDirectory(char* buffer); 
+void updatePath(char* buffer);
+
+char error_message[30] = "An error has occurred\n";
+char** PATH;
 
 int main(int argc, char** argv) {
     if (argc > 2) {
@@ -36,21 +41,13 @@ void initInteractiveShell() {
         }
         char* cmd;
         cmd = strsep(&buffer, " ");
-        int length = 0, max = 0;
-        char*  args = strdup("keke");
-        if (buffer == NULL) {
-            args = NULL;
-        } else {
-            parseArgs(buffer, &length, &max, args);
-        }
         int result;
         if ((result = strcmp(cmd, "exit")) == 0) {
             exit(0);
         } else if ((result = strcmp(cmd, "cd")) == 0) {
-            printf("cd entered\n");
-            changeDirectory(args, length, max);
+            changeDirectory(buffer);
         } else if ((result = strcmp(cmd, "path")) == 0) {
-            printf("path entered\n");
+            updatePath(buffer);
         } else {
             //execv
         }
@@ -66,40 +63,26 @@ void initBatchShell(char* batchFile) {
     ;
 }
 
-
-
-void changeDirectory(char* args, int length, int max) {
-    if (length != 1) {
-        printf("error: only 1 arguement\n");
-        return;
-    }
-    printf("this: %s\n", args);
-}
-
-void parseArgs(char* buffer, int* length, int* max, char* args) {
-    //int len = (int) strlen(buffer);
-    char temp[1000] = "";
-    strcpy(temp, buffer);
+void updatePath(char* args) {
     char* token;
-    int count = 0, maxLen = 0;
-    char* gg = temp;
-    while((token = strsep(&gg, " ")) != NULL) {
-        count++;
-        int len = strlen(token);
-        if (len > maxLen) {
-            maxLen = len;
-        }
+    while ((token = strsep(&args, " ")) != NULL) {
+        ;
     }
-    if (count == 0) {
+}
+
+void changeDirectory(char* args) {
+    if (args == NULL) {
+        write(STDERR_FILENO, error_message, strlen(error_message)); 
         return;
     }
-    char hehe[count][maxLen];
-    int i = 0;
-    while((token = strsep(&buffer, " ")) != NULL) {
-        strcpy(hehe[i], token);
-        i++;
+    char* path = strsep(&args, " ");
+    if (args != NULL) {
+        write(STDERR_FILENO, error_message, strlen(error_message)); 
+        return;
     }
-    *length = count;
-    args = (char*) hehe;
-    
+    int err = chdir(path);
+    if (err == -1) {
+        write(STDERR_FILENO, error_message, strlen(error_message)); 
+    }
 }
+
