@@ -1,3 +1,4 @@
+#include <sys/wait.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +50,37 @@ void initInteractiveShell() {
         } else if ((result = strcmp(cmd, "path")) == 0) {
             updatePath(buffer);
         } else {
-            //execv
+            int rc = fork();
+            if (rc < 0) {
+                write(STDERR_FILENO, error_message, strlen(error_message)); 
+                exit(0);
+            } else if (rc == 0) {
+                printf("child\n")si
+                char argv[100][100];
+                char* token;
+                int i = 0;
+                printf("child 2 \n");
+                while((token = strsep(&buffer, " ")) != NULL) {
+                    printf("inside before\n");
+                    strcpy(argv[i], token);
+                    printf("inside after\n");
+                    i++;
+                }
+                printf("i is: %d\n", i);
+                printf("child 3 \n");
+                argv[i][0] = '\0';
+                printf("mahalo\n");
+                for(int k = 0; k < i; k++) {
+                   printf("argv %d: %s\n", k, argv[k]);
+                }
+
+                execv(cmd, argv);
+            } else {
+                printf("before waiting\n");
+                wait(NULL);
+                printf("after waiting\n");
+            }
+            
         }
         /*
         while ((token = strsep(&buffer, " ")) != NULL) {
@@ -70,12 +101,11 @@ void updatePath(char* args) {
         strcpy(PATH[i], token);
         i++;
     }
-    strcpy(PATH[i], "\0");
-    /*
+   //strcpy(PATH[i], '\0');
+   PATH[i][0] = '\0';
     for(int k = 0; k < i; k++ ) {
         printf("path %d: %s\n", k, PATH[k]);
     }
-    */
 }
 
 void changeDirectory(char* args) {
